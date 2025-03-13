@@ -1,0 +1,37 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "compilerOptions": {
+    "lib": ["es2023"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "allowUmdGlobalAccess": true,
+    "allowJs": true,
+    "target": "es2023",
+    "sourceMap": true,
+    "sourceRoot": "",
+    "outDir": "./dist",
+    "incremental": true,
+    "resolveJsonModule": true,
+    "baseUrl": "./src",
+    "rootDir": "./src",
+    "skipLibCheck": true,
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+    ],
+    "paths": {
+      "@app/*": ["./*"],
+      "@lib/*": ["lib/*"],
+      "@modules/*": ["modules/*"]
+    }
+  },
+  "include": ["./src"],
+  "exclude": ["node_modules", "./node_modules", "./node_modules/*", "**/.*/"]
+}
