@@ -3,35 +3,57 @@
     "files": true
   },
   "compilerOptions": {
-    "lib": ["es2023"],
-    "module": "esnext",
-    "moduleResolution": "node",
+    "target": "es2023",
+    "lib": [
+      "es2023"
+    ],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "sourceMap": true,
+    "incremental": true,
     "declaration": true,
     "removeComments": true,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "allowUmdGlobalAccess": true,
-    "allowJs": true,
-    "target": "es2023",
-    "sourceMap": true,
-    "sourceRoot": "",
-    "outDir": "./dist",
-    "incremental": true,
-    "resolveJsonModule": true,
+    "emitDecoratorMetadata": true,
     "baseUrl": "./src",
-    "rootDir": "./src",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
     "skipLibCheck": true,
-    "plugins": [
-      { "transform": "typescript-transform-paths" },
-      { "transform": "typescript-transform-paths", "afterDeclarations": true }
-    ],
     "paths": {
-      "@app/*": ["./*"],
-      "@lib/*": ["lib/*"],
-      "@modules/*": ["modules/*"]
-    }
+      "@app/*": [
+        "./*"
+      ],
+      "@lib/*": [
+        "lib/*"
+      ],
+      "@models/*": [
+        "lib/db/models/*"
+      ],
+      "@modules/*": [
+        "modules/*"
+      ]
+    },
+    "plugins": [
+      {
+        "transform": "typescript-transform-paths"
+      },
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      }
+    ],
+    "strict": true
   },
-  "include": ["./src"],
-  "exclude": ["node_modules", "./node_modules", "./node_modules/*", "**/.*/"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*",
+    "dist",
+    "**/.*/"
+  ]
 }
