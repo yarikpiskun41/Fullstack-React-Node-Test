@@ -17,7 +17,7 @@
             "id": 1,
             "title": "Task 1",
             "description": "Task 1 Description",
-            "status": "pending"
+            "status": "backlog"
         },
         {
             "id": 2,
@@ -41,7 +41,7 @@
         "id": 1,
         "title": "Task 1",
         "description": "Task 1 Description",
-        "status": "pending"
+        "status": "backlog"
     }
 }
 ```
@@ -55,7 +55,7 @@
 {
     "title": "Task 3",
     "description": "Task 3 Description",
-    "status": "pending"
+    "status": "backlog"
 }
 ```
 - **Response Example:** 
@@ -66,7 +66,7 @@
         "id": 3,
         "title": "Task 3",
         "description": "Task 3 Description",
-        "status": "pending"
+        "status": "backlog"
     }
 }
 ```

@@ -1,42 +1,452 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+body {
+    background-color: #f4f7fa;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.25rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #6b48ff, #00ddeb);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: white;
+    margin-bottom: 30px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.app-header h1 {
+    margin: 0;
+    font-size: 1.75rem;
 }
 
-.card {
-  padding: 2em;
+.add-btn {
+    padding: 0.75rem 1.25rem;
+    background-color: #fff;
+    color: #6b48ff;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.read-the-docs {
-  color: #888;
+.add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.task-container {
+    padding: 20px;
+}
+
+.search-filter {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.search-input,
+.status-filter {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    flex: 1;
+}
+
+.search-input {
+    min-width: 200px;
+}
+
+.status-filter {
+    max-width: 200px;
+}
+
+.no-tasks {
+    text-align: center;
+    color: #888;
+    font-size: 18px;
+}
+
+.task-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+.task-card {
+    padding: 1.25rem;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+
+.task-card:hover {
+    transform: translateY(-5px);
+}
+
+.task-card.backlog {
+    border-left: 6px solid #ffd700;
+}
+
+.task-card.in-progress {
+    border-left: 6px solid #00b7eb;
+}
+
+.task-card.completed {
+    border-left: 6px solid #28c940;
+}
+
+.task-card h3 {
+    margin: 0 0 0.75rem 0;
+    color: #333;
+    font-size: 20px;
+}
+
+.task-card p {
+    margin: 0 0 0.75rem 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.description {
+    cursor: pointer;
+    max-height: 3rem;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.description.expanded {
+    max-height: 10rem;
+    overflow-y: auto;
+}
+
+.status-badge {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 12px;
+    font-size: 12px;
+    text-transform: capitalize;
+    background-color: #eee;
+    color: #555;
+}
+
+.task-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 10px;
+}
+
+.task-actions button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.task-actions button:first-child {
+    background-color: #00b7eb;
+    color: #fff;
+}
+
+.task-actions button:first-child:hover {
+    background-color: #0098c7;
+}
+
+.task-actions button:last-child {
+    background-color: #ff4d4d;
+    color: #fff;
+}
+
+.task-actions button:last-child:hover {
+    background-color: #e63939;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+    margin: 0 0 1.25rem 0;
+    color: #333;
+    font-size: 24px;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.modal-form input,
+.modal-form textarea,
+.modal-form select {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.modal-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.error {
+    color: #ff4d4d;
+    font-size: 12px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.625rem;
+    margin-top: 1.25rem;
+}
+
+.modal-actions button {
+    padding: 0.625rem 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+.modal-actions button:first-child {
+    background-color: #6b48ff;
+    color: white;
+}
+
+.modal-actions button:first-child:hover {
+    background-color: #5638d1;
+}
+
+.modal-actions button:last-child {
+    background-color: #ccc;
+    color: #333;
+}
+
+.modal-actions button:last-child:hover {
+    background-color: #b3b3b3;
+}
+
+.modal-content p {
+    margin: 0 0 20px 0;
+    color: #666;
+}
+
+.delete-confirm {
+    background-color: #ff4d4d !important;
+    color: white !important;
+}
+
+.delete-confirm:hover {
+    background-color: #e63939 !important;
+}
+
+@media (max-width: 768px) {
+    .app {
+        padding: 0.625rem;
+    }
+
+    .app-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding:1rem;
+    }
+
+    .app-header h1 {
+        font-size: 24px;
+    }
+
+    .add-btn {
+        padding: 0.5rem 1rem;
+        font-size: 14px;
+    }
+
+    .search-filter {
+        flex-direction: column;
+        gap: 0.625rem;
+    }
+
+    .search-input,
+    .status-filter {
+        min-width: unset;
+        max-width: unset;
+        font-size: 14px;
+    }
+
+    .task-grid {
+        grid-template-columns: 1fr; /* Single column layout */
+        gap: 15px;
+    }
+
+    .task-card {
+        padding: 15px;
+    }
+
+    .task-card h3 {
+        font-size: 18px;
+    }
+
+    .task-card p {
+        font-size: 13px;
+    }
+
+    .task-actions button {
+        padding: 0.35rem 0.75rem;
+        font-size: 13px;
+    }
+
+
+    .modal-content {
+        max-width: 90%;
+        padding: 1.25rem;
+    }
+
+    .modal-content h2 {
+        font-size: 20px;
+    }
+
+    .modal-form input,
+    .modal-form textarea,
+    .modal-form select {
+        font-size: 14px
+    }
+
+    .modal-actions button {
+        padding: 0.5rem 1rem;
+        font-size: 14px
+    }
+}
+
+@media (max-width: 480px) {
+    .app-header {
+        padding: 0.625rem;
+    }
+
+    .app-header h1 {
+        font-size: 20px;
+    }
+
+    .add-btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .task-container {
+        padding: 0.625rem;
+    }
+
+    .search-filter {
+        gap: 0.5rem;
+    }
+
+    .search-input,
+    .status-filter {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .no-tasks {
+        font-size: 1rem;
+    }
+
+    .task-card {
+        padding: 0.75rem;
+    }
+
+    .task-card h3 {
+        font-size: 1rem;
+    }
+
+    .task-card p {
+        font-size: 0.75rem;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        font-size: 10px;
+    }
+
+    .task-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .task-actions button {
+        padding: 0.375rem 0.625rem;
+        font-size: 0.75rem; /* 12px / 16 */
+    }
+
+    .modal-content {
+        padding: 1rem;
+    }
+
+    .modal-content h2 {
+        font-size: 1.25rem;
+    }
+
+    .modal-form {
+        gap: 0.625rem;
+    }
+
+    .modal-form input,
+    .modal-form textarea,
+    .modal-form select {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .modal-form textarea {
+        min-height: 3.75rem;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .modal-actions button {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+    }
 }
