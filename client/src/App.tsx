@@ -4,6 +4,7 @@ import "./App.css";
 import AddForm from "./components/forms/add.form.tsx";
 import EditForm from "./components/forms/edit.form.tsx";
 import {TaskType} from "./types/task.type.ts";
+import {toast} from "react-toastify";
 
 const API_URL = "http://localhost:5000/api/tasks";
 const statuses = [
@@ -22,10 +23,22 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: string]: boolean }>({});
+  const [errors, setErrors] = useState<string[]>([]);
 
   useEffect(() => {
     fetchTasks();
   }, []);
+
+  useEffect(() => {
+    const newErrors = [...errors];
+    if (newErrors?.length) {
+      while (newErrors.length) {
+        toast.error(newErrors.pop());
+      }
+      setErrors([]);
+    }
+
+  }, [errors]);
 
 
   const toggleDescription = (taskId: number, event: React.MouseEvent) => {
@@ -78,9 +91,35 @@ const App: React.FC = () => {
     resetForm();
   };
 
+  const validateForm = (): boolean => {
+    let newErrors = [...errors];
+    if (!task.title.trim()) {
+      newErrors?.push("Title is required");
+    }
+    else {
+      if (task.title.length < 2) {
+        newErrors?.push("Title must be at least 2 characters long");
+
+      }
+      if (task.title.length > 255) {
+        newErrors?.push("Title cannot exceed 255 characters");
+      }
+    }
+
+
+
+    if (!statuses.find(s => s.value === task.status)) {
+      newErrors?.push("Invalid status");
+    }
+
+    setErrors(newErrors);
+    return !newErrors || !newErrors?.length;
+  };
+
   const addTask = async (e: React.FormEvent) => {
       e.preventDefault();
       try {
+        if (!validateForm()) return;
         const response = await axios.post(API_URL, {
           title: task?.title,
           description: task?.description,
@@ -88,8 +127,7 @@ const App: React.FC = () => {
         });
         setTasks([...tasks, response.data.data]);
         closeModal();
-      } catch
-        (error) {
+      } catch (error) {
         console.error("Error adding task:", error);
       }
     }
@@ -98,6 +136,7 @@ const App: React.FC = () => {
   const updateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!validateForm()) return;
       const response = await axios.put(`${API_URL}/${task.id}`, {
         title: task.title,
         description: task.description,

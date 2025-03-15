@@ -11,6 +11,17 @@ type AddFormProps = {
 }
 
 const AddForm = ({addTask, setTask, closeModal, task, statuses}: AddFormProps) => {
+  const onTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTask({field: "title", fieldValue: e.target.value});
+  }
+  const onDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTask({field: "description", fieldValue: e.target.value});
+  }
+
+  const onStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTask({field: "status", fieldValue: e.target.value});
+  }
+
   return (
       <form onSubmit={addTask} className="modal-form">
         <div className="form-group">
@@ -18,15 +29,15 @@ const AddForm = ({addTask, setTask, closeModal, task, statuses}: AddFormProps) =
             type="text"
             placeholder="Title"
             value={task.title}
-            onChange={(e) => setTask({field: "title", fieldValue: e.target.value})}
+            onChange={onTitleChange}
           />
         </div>
         <textarea
           placeholder="Description"
           value={task.description}
-          onChange={(e) => setTask({field: "description", fieldValue: e.target.value})}
+          onChange={onDescriptionChange}
         />
-        <select value={task.status} onChange={(e) => setTask({field: "status", fieldValue: e.target.value})}>
+        <select value={task.status} onChange={onStatusChange}>
           {statuses.map((status) => (
             <option key={status.value} value={status.value}>
               {status.label}

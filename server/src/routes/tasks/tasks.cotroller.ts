@@ -38,7 +38,7 @@ export async function updateTask(req: Request, res: Response) {
   })
 
   if(!isAltered) {
-    res.status(404).json({status: 'Task not found'})
+    res.status(404).json({status: 'Error', message: 'Task not found'})
     return
   }
 
@@ -53,7 +53,7 @@ export async function deleteTask(req: Request, res: Response) {
   const task = await TaskModel.query().findById(id);
 
   if(!task) {
-    res.status(404).json({status: 'Task not found'})
+    res.status(404).json({status: 'Error', message: 'Task not found'})
     return
   }
 
