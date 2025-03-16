@@ -3,6 +3,8 @@ import 'dotenv/config'
 import {postgresDatabase} from '@lib/db/psql.client';
 import {tasksRouter} from "@app/routes/tasks/router";
 import cors from 'cors';
+import {authRouter} from "@app/routes/auth/router";
+import {authMiddleware} from "@lib/utils/middlewares/auth.middleware";
 
 const app = express();
 const port = process.env.PORT;
@@ -13,7 +15,8 @@ postgresDatabase()
 app.use(express.json());
 app.use(cors());
 
-app.use('/api/tasks', tasksRouter());
+app.use('/api/auth', authRouter());
+app.use('/api/tasks', authMiddleware(), tasksRouter());
 
 
 app.listen(port, () => {

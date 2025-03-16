@@ -10,7 +10,6 @@ body {
     padding: 1.25rem;
 }
 
-/* Header */
 .app-header {
     display: flex;
     justify-content: space-between;
@@ -19,13 +18,59 @@ body {
     background: linear-gradient(135deg, #6b48ff, #00ddeb);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    color: white;
+    color: #fff;
     margin-bottom: 30px;
 }
 
 .app-header h1 {
     margin: 0;
     font-size: 1.75rem;
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-actions span {
+    color: #fff;
+    font-size: 1rem; /* 16px / 16 */
+}
+
+.logout-btn {
+    padding: 0.625rem 1.25rem;
+    background-color: #2439bd;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+    background-color: #1631d6;
+}
+
+.auth-actions {
+    display: flex;
+    gap: 0.625rem; /* 10px / 16 */
+}
+
+.auth-actions button {
+    padding: 0.625rem 1.25rem;
+    background-color: #fff;
+    color: #6b48ff;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.auth-actions button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
 }
 
 .add-btn {
@@ -252,7 +297,7 @@ body {
 
 .modal-actions button:first-child {
     background-color: #6b48ff;
-    color: white;
+    color: #fff;
 }
 
 .modal-actions button:first-child:hover {
@@ -273,13 +318,13 @@ body {
     color: #666;
 }
 
-.delete-confirm {
-    background-color: #ff4d4d !important;
-    color: white !important;
+.modal-actions button.delete-confirm {
+    background-color: #ff4d4d;
+    color: #fff;
 }
 
-.delete-confirm:hover {
-    background-color: #e63939 !important;
+.modal-actions button.delete-confirm:hover {
+    background-color: #e63939;
 }
 
 @media (max-width: 768px) {
@@ -290,7 +335,7 @@ body {
     .app-header {
         flex-direction: column;
         gap: 1rem;
-        padding:1rem;
+        padding: 1rem;
     }
 
     .app-header h1 {

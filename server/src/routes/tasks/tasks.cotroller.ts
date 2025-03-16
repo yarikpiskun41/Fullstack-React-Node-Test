@@ -1,5 +1,6 @@
 import {TaskModel} from "@models/task.model";
 import {Request, Response} from 'express'
+import * as console from "node:console";
 
 export async function getTasks(req: Request<{ id?: string }>, res: Response) {
   const {id} = req.params;
@@ -30,6 +31,7 @@ export async function addTask(req: Request, res: Response) {
 export async function updateTask(req: Request, res: Response) {
   const {id} = req.params;
   const {title, description, status} = req.body;
+
 
   const isAltered = await TaskModel.query().findById(id).patch({
     title,

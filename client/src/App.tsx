@@ -1,33 +1,51 @@
 import React, {useState, useEffect} from "react";
-import axios from "axios";
+import axios, {AxiosError} from "axios";
 import "./App.css";
 import AddForm from "./components/forms/add.form.tsx";
 import EditForm from "./components/forms/edit.form.tsx";
 import {TaskType} from "./types/task.type.ts";
 import {toast} from "react-toastify";
+import {User} from "./types/user.type.ts";
+import LoginForm from "./components/forms/login.form.tsx";
+import RegisterForm from "./components/forms/register.form.tsx";
 
-const API_URL = "http://localhost:5000/api/tasks";
+const API_URL = "http://localhost:5000/api";
 const statuses = [
   {value: "backlog", label: "Backlog"},
   {value: "in-progress", label: "In Progress"},
   {value: "closed", label: "Closed"}
 ];
 
+type ModalType = "add" | "edit" | "delete" | "login" | "register";
+
 
 const App: React.FC = () => {
-
-
   const [tasks, setTasks] = useState<TaskType[]>([]);
-  const [modalType, setModalType] = useState<"add" | "edit" | "delete" | null>(null);
+  const [modalType, setModalType] = useState<ModalType | null>(null);
   const [task, setTask] = useState<TaskType>({title: "", description: "", status: ""});
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: string]: boolean }>({});
   const [errors, setErrors] = useState<string[]>([]);
 
+  const [user, setUser] = useState<User | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(localStorage.getItem("accessToken"));
+  const [refreshToken, setRefreshToken] = useState<string | null>(localStorage.getItem("refreshToken"));
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
   useEffect(() => {
-    fetchTasks();
+    if (accessToken && refreshToken) {
+      const user = JSON.parse(atob(accessToken.split(" ")[1].split(".")[1]));
+      setUser(user);
+    }
   }, []);
+
+  useEffect(() => {
+    if (accessToken && refreshToken) {
+      fetchTasks();
+    }
+  }, [accessToken]);
 
   useEffect(() => {
     const newErrors = [...errors];
@@ -49,14 +67,131 @@ const App: React.FC = () => {
     }));
   };
 
+  const apiRequest = async (method: string, url: string, data?: any) => {
+    let token = accessToken;
+    if (user?.exp && user.exp * 1000 < Date.now()) {
+      console.log("Token expired, refreshing...");
+      const newToken = await refreshAccessToken();
+      if (newToken) {
+        token = newToken;
+      }
+    }
+    try {
+      const response = await axios({
+        method,
+        url: `${API_URL}${url}`,
+        data,
+        headers: {Authorization: `${token}`},
+      });
+      return response;
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      if (axiosError.response?.status === 401) {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          return axios({
+            method,
+            url: `${API_URL}${url}`,
+            data,
+            headers: {Authorization: `${newToken}`},
+          });
+        }
+      }
+      throw axiosError;
+    }
+  };
+
+  const refreshAccessToken = async () => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/refresh-token`, {refreshToken});
+      const newAccessToken = response.data.data.accessToken;
+      setAccessToken(newAccessToken);
+      localStorage.setItem("accessToken", newAccessToken);
+      return newAccessToken;
+    } catch (error) {
+      handleLogout();
+      toast.error("Session expired. Please log in again.");
+      return null;
+    }
+  };
+
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get(API_URL);
+      const response = await apiRequest("get", "/tasks");
       setTasks(response.data.data || []);
     } catch (error) {
-      console.error("Error fetching tasks:", error);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      toast.error(axiosError.response?.data?.message || "Failed to fetch tasks.");
     }
+  };
+
+  const validateAuthForm = (): boolean => {
+    const newErrors = [...errors];
+    if (!username.trim()) newErrors.push("Username is required");
+    if (username.length < 3 || username.length > 40) newErrors.push("Username must be 3-40 characters");
+
+    if (!password.trim()) newErrors.push("Password is required");
+    else if (password.length < 6) newErrors.push("Password must be at least 6 characters");
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const initUser = ({accessToken, refreshToken}: { accessToken: string; refreshToken: string }) => {
+    const user = JSON.parse(atob(accessToken.split(" ")[1].split(".")[1]));
+    setAccessToken(accessToken);
+    setRefreshToken(refreshToken);
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+    setUser(user);
+  }
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateAuthForm()) return;
+
+    try {
+      const response = await axios.post(`${API_URL}/auth/sign-up`, {username, password});
+      const {accessToken, refreshToken} = response.data.data;
+      initUser({accessToken, refreshToken});
+      toast.success("Registration successful!");
+      closeModal();
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      toast.error(axiosError.response?.data?.message || "Failed to register.");
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateAuthForm()) return;
+
+    try {
+      const response = await axios.post(`${API_URL}/auth/sign-in`, {username, password});
+      const {accessToken, refreshToken} = response.data.data;
+      initUser({accessToken, refreshToken});
+      toast.success(`Logged in successful!`);
+      closeModal();
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      toast.error(axiosError.response?.data?.message || "Failed to log in.");
+    }
+  };
+
+  const handleLogout = () => {
+    axios
+      .post(`${API_URL}/auth/sign-out`, {refreshToken})
+      .then(() => {
+        setAccessToken(null);
+        setRefreshToken(null);
+        setUser(null);
+        setTasks([]);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        toast.success("Logged out successfully!");
+      })
+      .catch(() => toast.error("Error logging out"));
   };
 
 
@@ -72,7 +207,7 @@ const App: React.FC = () => {
     });
   }
 
-  const openModal = (type: "add" | "edit" | "delete", task?: TaskType) => {
+  const openModal = (type: ModalType, task?: TaskType) => {
     setModalType(type);
     if (type === "add") {
       resetForm();
@@ -88,6 +223,8 @@ const App: React.FC = () => {
   const closeModal = () => {
     setModalType(null);
     setTask({title: "", description: "", status: ""});
+    setUsername("");
+    setPassword("");
     resetForm();
   };
 
@@ -95,8 +232,7 @@ const App: React.FC = () => {
     let newErrors = [...errors];
     if (!task.title.trim()) {
       newErrors?.push("Title is required");
-    }
-    else {
+    } else {
       if (task.title.length < 2) {
         newErrors?.push("Title must be at least 2 characters long");
 
@@ -105,7 +241,6 @@ const App: React.FC = () => {
         newErrors?.push("Title cannot exceed 255 characters");
       }
     }
-
 
 
     if (!statuses.find(s => s.value === task.status)) {
@@ -120,7 +255,7 @@ const App: React.FC = () => {
       e.preventDefault();
       try {
         if (!validateForm()) return;
-        const response = await axios.post(API_URL, {
+        const response = await apiRequest("POST", `${API_URL}/tasks`, {
           title: task?.title,
           description: task?.description,
           status: task?.status
@@ -137,7 +272,7 @@ const App: React.FC = () => {
     e.preventDefault();
     try {
       if (!validateForm()) return;
-      const response = await axios.put(`${API_URL}/${task.id}`, {
+      const response = await apiRequest("PUT", `/tasks/${task.id}`, {
         title: task.title,
         description: task.description,
         status: task.status,
@@ -154,8 +289,8 @@ const App: React.FC = () => {
   const deleteTask = async () => {
     if (!task) return;
     try {
-      await axios.delete(`${API_URL}/${task.id}`);
-      setTasks(tasks.filter((task) => task.id !== task.id));
+      await apiRequest("DELETE", `/tasks/${task.id}`);
+      setTasks(tasks.filter((currentTask) => currentTask.id !== task.id));
       closeModal();
     } catch (error) {
       console.error("Error deleting task:", error);
@@ -182,9 +317,19 @@ const App: React.FC = () => {
     <div className="app">
       <header className="app-header">
         <h1>Task Manager</h1>
-        <button className="add-btn" onClick={() => openModal("add")}>
-          + Add Task
-        </button>
+        {user ? (
+          <div className="user-actions">
+            <span>Welcome, {user.username}</span>
+            <button className="logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        ) : (
+          <div className="auth-actions">
+            <button onClick={() => openModal("login")}>Login</button>
+            <button onClick={() => openModal("register")}>Register</button>
+          </div>
+        )}
       </header>
 
       <main className="task-container">
@@ -208,6 +353,9 @@ const App: React.FC = () => {
               </option>
             ))}
           </select>
+          <button className="add-btn" onClick={() => openModal("add")}>
+            + Add Task
+          </button>
         </div>
 
         {filteredTasks.length === 0 ? (
@@ -241,6 +389,24 @@ const App: React.FC = () => {
       {modalType && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            {
+              modalType === "login" && (
+                <>
+                  <h2>Login</h2>
+                  <LoginForm loginHandle={handleLogin} setUsername={setUsername} setPassword={setPassword}
+                             closeModal={closeModal} username={username} password={password}/>
+                </>
+              )
+            }
+            {
+              modalType === "register" && (
+                <>
+                  <h2>Register</h2>
+                  <RegisterForm registerHandle={handleRegister} setUsername={setUsername} setPassword={setPassword}
+                                closeModal={closeModal} username={username} password={password}/>
+                </>
+              )
+            }
             {modalType === "add" && (
               <>
                 <h2>Add New Task</h2>
