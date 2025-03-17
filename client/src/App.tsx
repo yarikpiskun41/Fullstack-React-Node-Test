@@ -9,7 +9,7 @@ import {User} from "./types/user.type.ts";
 import LoginForm from "./components/forms/login.form.tsx";
 import RegisterForm from "./components/forms/register.form.tsx";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL;
 const statuses = [
   {value: "backlog", label: "Backlog"},
   {value: "in-progress", label: "In Progress"},
@@ -20,6 +20,7 @@ type ModalType = "add" | "edit" | "delete" | "login" | "register";
 
 
 const App: React.FC = () => {
+
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [modalType, setModalType] = useState<ModalType | null>(null);
   const [task, setTask] = useState<TaskType>({title: "", description: "", status: ""});

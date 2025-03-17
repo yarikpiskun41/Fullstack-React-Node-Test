@@ -7,7 +7,7 @@ import {authRouter} from "@app/routes/auth/router";
 import {authMiddleware} from "@lib/utils/middlewares/auth.middleware";
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 5000;
 
 postgresDatabase()
 
@@ -17,6 +17,10 @@ app.use(cors());
 
 app.use('/api/auth', authRouter());
 app.use('/api/tasks', authMiddleware(), tasksRouter());
+
+app.get("/health", (req, res) => {
+  res.status(200).send({"status": "OK"});
+})
 
 
 app.listen(port, () => {

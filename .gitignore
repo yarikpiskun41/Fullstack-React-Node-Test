@@ -5,3 +5,7 @@
 */**/.env
 */**/.vite
 */**/.vite-temp
+.env
+.env.db
+.env.client
+server/tsconfig.tsbuildinfo
