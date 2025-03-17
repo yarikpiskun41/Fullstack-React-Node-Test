@@ -255,7 +255,7 @@ const App: React.FC = () => {
       e.preventDefault();
       try {
         if (!validateForm()) return;
-        const response = await apiRequest("POST", `${API_URL}/tasks`, {
+        const response = await apiRequest("POST", `/tasks`, {
           title: task?.title,
           description: task?.description,
           status: task?.status
