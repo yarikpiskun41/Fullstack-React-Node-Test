@@ -3,7 +3,91 @@
 **API URL:** `http://localhost:{PORT}/api`
 
 
-### API Endpoints
+## API Endpoints
+
+### AUTH ENDPOINTS
+
+#### Sign up
+- **Path:** `/auth/sign-up`
+- **Method:** `POST`
+- **Request Body:**
+```json
+{
+    "username": "username",
+    "password": "password"
+}
+```
+- **Response Example:**
+```json
+{
+  "status": "OK",
+  "data": {
+    "accessToken" : "Bearer token",
+    "refreshToken": "token"
+  }
+}
+```
+
+#### Sign in
+- **Path:** `/auth/sign-in`
+- **Method:** `POST`
+- **Request Body:**
+```json
+{
+  "username": "username",
+  "password": "password"
+}
+```
+- **Response Example:**
+```json
+{
+  "status": "OK",
+  "data": {
+    "accessToken" : "Bearer token",
+    "refreshToken": "token"
+  }
+}
+```
+
+#### Sign out
+- **Path:** `/auth/sign-out`
+- **Method:** `POST`
+- **Request Body:**
+```json
+{
+  "refreshToken": "token"
+}
+```
+- **Response Example:**
+```json
+{
+  "status": "OK"
+}
+```
+
+#### Refresh tokens
+- **Path:** `/auth/refresh-token`
+- **Method:** `POST`
+- **Request Body:**
+```json
+{
+  "refreshToken": "token"
+}
+```
+- **Response Example:**
+```json
+{
+  "status": "OK",
+  "data": {
+    "accessToken": "Bearer newAccessToken"
+  }
+}
+```
+
+
+### TASKS ENDPOINTS
+
+**```"Authorization" header is needed```**
 
 #### Get All Tasks
 - **Path:** `/tasks`
