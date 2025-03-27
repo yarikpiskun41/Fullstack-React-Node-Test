@@ -1,18 +1,29 @@
 {
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "target": "ES2022",
-    "lib": ["ES2023"],
+    "target": "ESNext",
+    "lib": ["dom", "ESNext"],
     "module": "ESNext",
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "Node",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
+    "composite": true,
+    "jsx": "react-jsx",
+    "allowSyntheticDefaultImports": true,
     "noEmit": true,
-
+    "types": [
+      "vite/client",
+      "jest",
+      "node",
+      "@testing-library/jest-dom",
+      "@types/axios",
+      "@types/react-toastify",
+      "@types/axios-mock-adapter"
+    ],
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
@@ -20,5 +31,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "tests"],
+  "references": [
+    { "path": "./tsconfig.app.json" }
+  ]
 }

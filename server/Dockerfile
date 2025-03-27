@@ -10,6 +10,4 @@ COPY . .
 RUN npm rebuild bcrypt --build-from-source
 
 
-
-
 CMD ["sh", "-c", "npm run knex migrate:latest --knexfile knexfile.mjs && npm run build && npm run start"]

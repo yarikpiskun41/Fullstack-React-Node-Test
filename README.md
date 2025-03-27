@@ -3,6 +3,51 @@
 **API URL:** `http://localhost:{PORT}/api`
 
 
+## SETUP
+
+Use the **.env.example** file to create a **.env** file in the same folder, and fill in the required fields.
+
+### To local run
+
+Fill the `.env` files using the `.env.example` templates in both the `client` and `server` folders,
+then follow the steps below:
+
+
+#### Client
+```
+npm run build # Builds the app
+```
+**OR**
+```
+npm run dev # Runs the app in development mode
+```
+
+#### Server
+
+```
+# To build and run the app
+npm run build
+npm run start
+```
+**OR**
+```
+# To run the app in development mode
+npm run build:watch
+npm run start:watch
+```
+
+### Docker Run
+- Fill the `.env`, `.env.client`, `.env.db` files using the `.env.example`, `.env.client.example` and `.env.db.example` templates
+- Use the Docker Compose file to start the app.
+
+### Testing
+
+Run `npm run test` in both the `server` and `client` folders to verify that everything is working correctly.
+
+#### Writing Tests
+
+Write tests in the `/tests` folder of either the `server` or `client` directories.
+
 ## API Endpoints
 
 ### AUTH ENDPOINTS

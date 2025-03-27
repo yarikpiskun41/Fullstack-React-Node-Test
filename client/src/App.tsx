@@ -8,8 +8,8 @@ import {toast} from "react-toastify";
 import {User} from "./types/user.type.ts";
 import LoginForm from "./components/forms/login.form.tsx";
 import RegisterForm from "./components/forms/register.form.tsx";
+import {API_URL} from "./constants.ts";
 
-const API_URL = import.meta.env.VITE_API_URL;
 const statuses = [
   {value: "backlog", label: "Backlog"},
   {value: "in-progress", label: "In Progress"},

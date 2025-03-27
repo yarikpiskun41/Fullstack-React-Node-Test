@@ -1,15 +1,13 @@
 import express from 'express';
 import 'dotenv/config'
-import {postgresDatabase} from '@lib/db/psql.client';
 import {tasksRouter} from "@app/routes/tasks/router";
 import cors from 'cors';
 import {authRouter} from "@app/routes/auth/router";
 import {authMiddleware} from "@lib/utils/middlewares/auth.middleware";
+import {postgresDatabase} from "@lib/db/psql.client";
 
 const app = express();
-const port = process.env.PORT || 5000;
 
-postgresDatabase()
 
 
 app.use(express.json());
@@ -23,6 +21,14 @@ app.get("/health", (req, res) => {
 })
 
 
-app.listen(port, () => {
-  console.log(`STARTED ON PORT ${port}`);
-})
+
+
+if (require.main === module) {
+  postgresDatabase()
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    return console.log(`STARTED ON PORT ${port}`);
+  })
+}
+
+export default app;
